@@ -1,23 +1,18 @@
 import express from 'express';
+import morgan from 'morgan';
 
 const app = express();
 
-const logger = (request, response, next) => {
-  console.log(`${request.method} ${request.url}`);
-  next();
-};
+const logger = morgan('dev');
 
 app.use(logger);
 
-const handleHome = (request, response) => {
-  console.log('HOME');
-  return response.send('Hello world');
-};
+const home = (request, response) => response.send('Hello world');
 
 app.get(
   '/',
   // middleware,
-  handleHome
+  home
 );
 
 const handleListening = () => {
