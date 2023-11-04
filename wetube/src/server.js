@@ -2,18 +2,23 @@ import express from 'express';
 
 const app = express();
 
+const logger = (request, response, next) => {
+  console.log(`${request.method} ${request.url}`);
+  next();
+};
+
+app.use(logger);
+
 const handleHome = (request, response) => {
   console.log('HOME');
   return response.send('Hello world');
 };
 
-const handleLogin = (request, response) => {
-  console.log('Login');
-  return response.send('Hello Login');
-};
-
-app.get('/', handleHome);
-app.get('/login', handleLogin);
+app.get(
+  '/',
+  // middleware,
+  handleHome
+);
 
 const handleListening = () => {
   console.log('Server is Running');
