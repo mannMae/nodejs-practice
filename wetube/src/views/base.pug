@@ -2,9 +2,19 @@ doctype html
 html(lang="ko")
     head 
         title #{pageTitle} | WeTube
+        link(rel="stylesheet" href="https://unpkg.com/mvp.css")
         block scripts
-    body 
-        block content
-        nav
-            block nav
+    body
+        header
+            nav 
+                ul 
+                    if true
+                        li
+                            a(href="/login") Logout
+                    else
+                        li
+                            a(href="/login") Login
+            h1=pageTitle
+        main
+            block content
         include partials/footer
