@@ -53,6 +53,20 @@ export const postEdit = () => {
   const { title } = request.body;
   return response.redirect(`/videos/${id}`);
 };
+export const getUpload = (request, response) => {
+  response.render('upload', { pageTitle: 'Upload Video' });
+};
+export const postUpload = (request, response) => {
+  const { title } = request.body;
+  const newVideo = {
+    title,
+    rating: 0,
+    comments: 0,
+    createdAt: Date.now(),
+    views: 0,
+    id: videos.length + 1,
+  };
+  return response.redirect('/');
+};
 export const search = (request, response) => response.send('Search');
-export const upload = (request, response) => response.send('Upload');
 export const remove = (request, response) => response.send('Delete');
