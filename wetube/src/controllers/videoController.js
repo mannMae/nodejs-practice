@@ -1,4 +1,5 @@
 import { response } from 'express';
+import { videoMoel } from '../models/Video';
 
 const videos = [
   {
@@ -35,8 +36,14 @@ const videos = [
   },
 ];
 
-export const trending = (request, response) => {
-  return response.render('home', { pageTitle: 'Home', videos });
+export const home = async (request, response) => {
+  try {
+    const videos = await videoMoel.find({});
+    return response.render('home', { pageTitle: 'Home', videos });
+  } catch (error) {
+    console.error(error);
+    return response.send(error);
+  }
 };
 export const watch = (request, response) => {
   const { id } = request.params;
