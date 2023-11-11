@@ -45,14 +45,14 @@ export const home = async (request, response) => {
     return response.send(error);
   }
 };
-export const watch = (request, response) => {
+export const watch = async (request, response) => {
   const { id } = request.params;
-  const video = videos.find((v) => String(v.id) === id);
+  const video = await videoMoel.findById(id);
   return response.render('watch', { pageTitle: `${video.title}`, video });
 };
-export const getEdit = (request, response) => {
+export const getEdit = async (request, response) => {
   const { id } = request.params;
-  const video = videos.find((v) => String(v.id) === id);
+  const video = await videoMoel.findById(id);
   return response.render('edit', { pageTitle: `Edit "${video.title}"`, video });
 };
 export const postEdit = () => {
@@ -61,19 +61,25 @@ export const postEdit = () => {
   return response.redirect(`/videos/${id}`);
 };
 export const getUpload = (request, response) => {
-  response.render('upload', { pageTitle: 'Upload Video' });
+  return response.render('upload', { pageTitle: 'Upload Video' });
 };
-export const postUpload = (request, response) => {
-  const { title } = request.body;
-  const newVideo = {
-    title,
-    rating: 0,
-    comments: 0,
-    createdAt: Date.now(),
-    views: 0,
-    id: videos.length + 1,
-  };
-  return response.redirect('/');
+export const postUpload = async (request, response) => {
+  const { title, description, hashtags } = request.body;
+  try {
+    await videoMoel.create({
+      title,
+      description,
+      hashtags: hashtags.split(',').map((tag) => `#${tag}`),
+      createdAt: Date.now(),
+    });
+    return response.redirect('/');
+  } catch (error) {
+    console.error(error);
+    return response.render('upload', {
+      pageTitle: 'Upload Video',
+      errorMessage: error._message,
+    });
+  }
 };
 export const search = (request, response) => response.send('Search');
 export const remove = (request, response) => response.send('Delete');
