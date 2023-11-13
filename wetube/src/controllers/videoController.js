@@ -63,4 +63,8 @@ export const postUpload = async (request, response) => {
   }
 };
 export const search = (request, response) => response.send('Search');
-export const remove = (request, response) => response.send('Delete');
+export const deleteVideo = async (request, response) => {
+  const { id } = request.params;
+  await videoModel.findByIdAndDelete(id);
+  return response.redirect('/');
+};
