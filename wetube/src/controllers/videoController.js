@@ -3,7 +3,7 @@ import { videoModel } from '../models/Video';
 
 export const home = async (request, response) => {
   try {
-    const videos = await videoModel.find({});
+    const videos = await videoModel.find({}).sort({ createAt: 'desc' });
     return response.render('home', { pageTitle: 'Home', videos });
   } catch (error) {
     console.error(error);
@@ -62,7 +62,21 @@ export const postUpload = async (request, response) => {
     });
   }
 };
-export const search = (request, response) => response.send('Search');
+export const search = async (request, response) => {
+  const { keyword } = request.query;
+  let videos = [];
+  if (keyword) {
+    videos = await videoModel
+      .find({
+        title: {
+          $regex: new RegExp(keyword, 'i'),
+        },
+      })
+      .sort({ createAt: 'desc' });
+  }
+  console.log(videos);
+  return response.render('search', { pageTitle: 'Search', videos });
+};
 export const deleteVideo = async (request, response) => {
   const { id } = request.params;
   await videoModel.findByIdAndDelete(id);
