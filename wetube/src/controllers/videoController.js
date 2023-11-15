@@ -14,7 +14,7 @@ export const watch = async (request, response) => {
   const { id } = request.params;
   const video = await videoModel.findById(id);
   if (video === null) {
-    return response.render('404', { pageTitle: 'Video not found' });
+    return response.status(404).render('404', { pageTitle: 'Video not found' });
   }
   return response.render('watch', { pageTitle: `${video.title}`, video });
 };
@@ -22,7 +22,7 @@ export const getEdit = async (request, response) => {
   const { id } = request.params;
   const video = await videoModel.findById(id);
   if (!video) {
-    return response.render('404', { pageTitle: 'Video not found' });
+    return response.status(404).render('404', { pageTitle: 'Video not found' });
   }
   return response.render('edit', { pageTitle: `Edit "${video.title}"`, video });
 };
@@ -31,7 +31,7 @@ export const postEdit = async (request, response) => {
   const { title, description, hashtags } = request.body;
   const video = await videoModel.exists({ _id: id });
   if (!video) {
-    return response.render('404', { pageTitle: 'Video not found' });
+    return response.status(404).render('404', { pageTitle: 'Video not found' });
   }
 
   await videoModel.findByIdAndUpdate(id, {
@@ -56,7 +56,7 @@ export const postUpload = async (request, response) => {
     return response.redirect('/');
   } catch (error) {
     console.error(error);
-    return response.render('upload', {
+    return response.status(400).render('upload', {
       pageTitle: 'Upload Video',
       errorMessage: error._message,
     });

@@ -1,5 +1,6 @@
 import './db';
 import { videoMoel } from './models/Video';
+import { userMoel } from './models/User';
 import { app } from './server';
 
 const handleListening = () => {
