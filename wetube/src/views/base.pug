@@ -8,10 +8,14 @@ html(lang="ko")
         header
             nav 
                 ul 
-                    if true
+                    if loggedIn
                         li
                             a(href="/login") Logout
+                        li
+                            a(href="/my-profile") #{loggedInUser.name}님의 프로필
                     else
+                        li
+                            a(href="/join") Join
                         li
                             a(href="/login") Login
                     li
@@ -20,8 +24,6 @@ html(lang="ko")
                         a(href="/") Home
                     li
                         a(href="/search") Search
-                    li
-                        a(href="/join") Join
             h1=pageTitle
         main
             block content

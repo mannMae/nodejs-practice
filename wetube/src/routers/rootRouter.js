@@ -1,10 +1,15 @@
 import express from 'express';
-import { getJoin, login, postJoin } from '../controllers/userController';
+import {
+  getJoin,
+  getLogin,
+  postJoin,
+  postLogin,
+} from '../controllers/userController';
 import { home, search } from '../controllers/videoController';
 
 export const rootRouter = express.Router();
 
 rootRouter.get('/', home);
 rootRouter.route('/join').get(getJoin).post(postJoin);
-rootRouter.get('/login', login);
+rootRouter.route('/login').get(getLogin).post(postLogin);
 rootRouter.get('/search', search);
