@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import './db';
 import { videoMoel } from './models/Video';
 import { userMoel } from './models/User';
