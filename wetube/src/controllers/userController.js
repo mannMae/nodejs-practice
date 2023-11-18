@@ -1,4 +1,5 @@
 import bcrypt from 'bcrypt';
+import fetch from 'node-fetch';
 
 import { userModel } from '../models/User';
 
@@ -69,3 +70,47 @@ export const remove = (request, response) => response.send('Remove user');
 
 export const logout = (request, response) => response.send('logout user');
 export const see = (request, response) => response.send('see user');
+
+export const startGithubLogin = (request, response) => {
+  const baseUrl = 'https://github.com/login/oauth/authorize';
+  const config = {
+    client_id: process.env.GITHUB_CLIENT,
+    allow_signup: false,
+    scope: 'read:user user:email',
+  };
+  const params = new URLSearchParams(config).toString();
+  const redirectUrl = `${baseUrl}?${params}`;
+  return response.redirect(redirectUrl);
+};
+
+export const finishGithubLogin = async (request, response) => {
+  const baseUrl = 'https://github.com/login/oauth/access_token';
+  const config = {
+    client_id: process.env.GITHUB_CLIENT,
+    client_secret: process.env.GITHUB_SECRET,
+    code: request.query.code,
+  };
+  const params = new URLSearchParams(config).toString();
+  const requestUrl = `${baseUrl}?${params}`;
+  const tokenData = await (
+    await fetch(requestUrl, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+      },
+    })
+  ).json();
+  const { access_token } = tokenData;
+  if (access_token) {
+    const userData = await (
+      await fetch('https://api.github.com/user', {
+        headers: {
+          Authorization: `token ${access_token}`,
+        },
+      })
+    ).json();
+    return response.send(JSON.stringify(userData));
+  } else {
+    return response.redirect('/login');
+  }
+};
