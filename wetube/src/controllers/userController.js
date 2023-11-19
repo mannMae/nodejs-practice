@@ -40,7 +40,7 @@ export const getLogin = (request, response) => {
 };
 export const postLogin = async (request, response) => {
   const { username, password } = request.body;
-  const user = await userModel.findOne({ username });
+  const user = await userModel.findOne({ username, socialOnly: false });
   const pageTitle = 'Login';
 
   if (!user) {
@@ -68,7 +68,10 @@ export const postLogin = async (request, response) => {
 export const edit = (request, response) => response.send('edit user');
 export const remove = (request, response) => response.send('Remove user');
 
-export const logout = (request, response) => response.send('logout user');
+export const logout = (request, response) => {
+  request.session.destroy();
+  return response.redirect('/');
+};
 export const see = (request, response) => response.send('see user');
 
 export const startGithubLogin = (request, response) => {
@@ -102,14 +105,49 @@ export const finishGithubLogin = async (request, response) => {
   ).json();
   const { access_token } = tokenData;
   if (access_token) {
+    const apiUrl = 'https://api.github.com';
     const userData = await (
-      await fetch('https://api.github.com/user', {
+      await fetch(`${apiUrl}/user`, {
         headers: {
           Authorization: `token ${access_token}`,
         },
       })
     ).json();
-    return response.send(JSON.stringify(userData));
+
+    const emailData = await (
+      await fetch(`${apiUrl}/user/emails`, {
+        headers: {
+          Authorization: `token ${access_token}`,
+        },
+      })
+    ).json();
+
+    const emailObject = emailData.find(
+      (email) => email.primary === true && email.verified === true
+    );
+
+    if (!emailObject) {
+      return response.redirect('/');
+    }
+
+    let user = await userModel.findOne({ email: emailObject.email });
+
+    if (!user) {
+      user = await userModel.create({
+        avatartUrl: userData.avatart_url,
+        name: userData.name,
+        username: userData.login,
+        email: emailObject.email,
+        password: '',
+        socialOnly: true,
+        location: userData.location,
+      });
+    }
+
+    request.session.loggedIn = true;
+    request.session.user = user;
+    return response.redirect('/');
+    // return response.send(JSON.stringify(userData));
   } else {
     return response.redirect('/login');
   }
