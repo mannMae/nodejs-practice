@@ -65,7 +65,6 @@ export const postLogin = async (request, response) => {
   return response.redirect('/');
 };
 
-export const edit = (request, response) => response.send('edit user');
 export const remove = (request, response) => response.send('Remove user');
 
 export const logout = (request, response) => {
@@ -151,4 +150,12 @@ export const finishGithubLogin = async (request, response) => {
   } else {
     return response.redirect('/login');
   }
+};
+
+export const getEdit = (request, response) => {
+  return response.render('edit-profile', { pageTitle: 'Edit Profile' });
+};
+
+export const postEdit = (request, response) => {
+  return response.redirect('/');
 };
