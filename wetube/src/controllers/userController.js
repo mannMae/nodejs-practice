@@ -156,6 +156,24 @@ export const getEdit = (request, response) => {
   return response.render('edit-profile', { pageTitle: 'Edit Profile' });
 };
 
-export const postEdit = (request, response) => {
-  return response.redirect('/');
+export const postEdit = async (request, response) => {
+  const {
+    session: {
+      user: { _id },
+    },
+    body: { name, email, username, location },
+  } = request;
+  await userModel.findByIdAndUpdate(
+    _id,
+    { name, email, username, location },
+    { new: true }
+  );
+  request.session.user = {
+    ...request.session.user,
+    name,
+    email,
+    username,
+    location,
+  };
+  return response.redirect('/users/edit');
 };
