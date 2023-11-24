@@ -211,7 +211,8 @@ export const postChangePassword = async (request, response) => {
   }
 
   const user = await userModel.findById(_id);
-  user.password = newPasswword;
+  user.password = newPassword;
   await user.save();
+  request.session.user.passwword = user.password;
   return response.redirect('/');
 };
