@@ -159,9 +159,10 @@ export const getEdit = (request, response) => {
 export const postEdit = async (request, response) => {
   const {
     session: {
-      user: { _id },
+      user: { _id, avatarUrl },
     },
     body: { name, email, username, location },
+    file,
   } = request;
   await userModel.findByIdAndUpdate(
     _id,
@@ -170,6 +171,7 @@ export const postEdit = async (request, response) => {
   );
   request.session.user = {
     ...request.session.user,
+    avatarUrl: file ? file.path : avatarUrl,
     name,
     email,
     username,
