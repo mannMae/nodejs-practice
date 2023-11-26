@@ -12,7 +12,7 @@ import {
   postChangePassword,
 } from '../controllers/userController';
 import {
-  fileUploadMiddleware,
+  avatarUploadMiddleware,
   protectorMiddleware,
   publicOnlyMiddleware,
 } from '../middlewares';
@@ -24,7 +24,7 @@ userRouter
   .route('/edit')
   .all(protectorMiddleware)
   .get(getEdit)
-  .post(fileUploadMiddleware.single('avatar'), postEdit);
+  .post(avatarUploadMiddleware.single('avatar'), postEdit);
 userRouter.get('/remove', remove);
 userRouter
   .route('/change-password')

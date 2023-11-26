@@ -20,4 +20,12 @@ export const publicOnlyMiddleware = (request, response, next) => {
   return response.redirect('/');
 };
 
-export const fileUploadMiddleware = multer({ dest: 'uploads/' });
+export const avatarUploadMiddleware = multer({
+  dest: 'uploads/avatars/',
+  limits: { fileSize: 3000000 },
+});
+
+export const videoUploadMiddleware = multer({
+  dest: 'uploads/videos/',
+  limits: { fileSize: 150000000 },
+});
