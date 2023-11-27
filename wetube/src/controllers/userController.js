@@ -71,7 +71,18 @@ export const logout = (request, response) => {
   request.session.destroy();
   return response.redirect('/');
 };
-export const see = (request, response) => response.send('see user');
+
+export const see = async (request, response) => {
+  const { id } = request.params;
+  const user = await userModel.findById(id);
+  if (!user) {
+    return response.status(404).render('404');
+  }
+  return response.render('users/profile', {
+    pageTitle: user.name,
+    user,
+  });
+};
 
 export const startGithubLogin = (request, response) => {
   const baseUrl = 'https://github.com/login/oauth/authorize';
