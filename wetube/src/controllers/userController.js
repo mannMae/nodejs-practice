@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt';
 import fetch from 'node-fetch';
 
 import { userModel } from '../models/User';
+import { videoModel } from '../models/Video';
 
 export const getJoin = (request, response) =>
   response.render('join', { pageTitle: 'Join' });
@@ -78,9 +79,11 @@ export const see = async (request, response) => {
   if (!user) {
     return response.status(404).render('404');
   }
+  const videos = await videoModel.find({ owner: user._id });
   return response.render('users/profile', {
     pageTitle: user.name,
     user,
+    videos,
   });
 };
 

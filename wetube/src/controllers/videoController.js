@@ -12,11 +12,16 @@ export const home = async (request, response) => {
 };
 export const watch = async (request, response) => {
   const { id } = request.params;
-  const video = await videoModel.findById(id);
+  ``;
+  const video = await videoModel.findById(id).populate('owner');
   if (video === null) {
     return response.status(404).render('404', { pageTitle: 'Video not found' });
   }
-  return response.render('watch', { pageTitle: `${video.title}`, video });
+  return response.render('watch', {
+    pageTitle: `${video.title}`,
+    video,
+    owner,
+  });
 };
 export const getEdit = async (request, response) => {
   const { id } = request.params;
@@ -45,13 +50,19 @@ export const getUpload = (request, response) => {
   return response.render('upload', { pageTitle: 'Upload Video' });
 };
 export const postUpload = async (request, response) => {
-  const { path: fileUrl } = request.file;
-  const { title, description, hashtags } = request.body;
+  const {
+    session: {
+      user: { _id },
+    },
+    file: { path: fileUrl },
+    body: { title, description, hashtags },
+  } = request;
   try {
     await videoModel.create({
       title,
       description,
       fileUrl,
+      owner: _id,
       hashtags: videoModel.formatHashtags(hashtags),
       createdAt: Date.now(),
     });
