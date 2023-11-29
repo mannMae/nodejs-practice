@@ -75,15 +75,13 @@ export const logout = (request, response) => {
 
 export const see = async (request, response) => {
   const { id } = request.params;
-  const user = await userModel.findById(id);
+  const user = await userModel.findById(id).populate('videos');
   if (!user) {
     return response.status(404).render('404');
   }
-  const videos = await videoModel.find({ owner: user._id });
   return response.render('users/profile', {
     pageTitle: user.name,
     user,
-    videos,
   });
 };
 

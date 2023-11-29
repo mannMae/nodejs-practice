@@ -1,5 +1,6 @@
 import { response } from 'express';
 import { videoModel } from '../models/Video';
+import { userModel } from '../models/User';
 
 export const home = async (request, response) => {
   try {
@@ -24,10 +25,18 @@ export const watch = async (request, response) => {
   });
 };
 export const getEdit = async (request, response) => {
-  const { id } = request.params;
+  const {
+    params: { id },
+    session: {
+      user: { _id },
+    },
+  } = request;
   const video = await videoModel.findById(id);
   if (!video) {
     return response.status(404).render('404', { pageTitle: 'Video not found' });
+  }
+  if (String(video.owner) !== String(_id)) {
+    return response.status(403).redirect('/');
   }
   return response.render('edit', { pageTitle: `Edit "${video.title}"`, video });
 };
@@ -58,7 +67,7 @@ export const postUpload = async (request, response) => {
     body: { title, description, hashtags },
   } = request;
   try {
-    await videoModel.create({
+    const newVideo = await videoModel.create({
       title,
       description,
       fileUrl,
@@ -66,6 +75,9 @@ export const postUpload = async (request, response) => {
       hashtags: videoModel.formatHashtags(hashtags),
       createdAt: Date.now(),
     });
+    const user = await userModel.findById(_id);
+    user.videos.push(newVideo._id);
+    user.save();
     return response.redirect('/');
   } catch (error) {
     console.error(error);
@@ -91,7 +103,19 @@ export const search = async (request, response) => {
   return response.render('search', { pageTitle: 'Search', videos });
 };
 export const deleteVideo = async (request, response) => {
-  const { id } = request.params;
+  const {
+    params: { id },
+    session: {
+      user: { _id },
+    },
+  } = request;
+  const video = await videoModel.findById(id);
+  if (!video) {
+    return response.status(404).render('404', { pageTitle: 'Video not found' });
+  }
+  if (String(video.owner !== String(_id))) {
+    return response.status(403).redirect('/');
+  }
   await videoModel.findByIdAndDelete(id);
   return response.redirect('/');
 };
