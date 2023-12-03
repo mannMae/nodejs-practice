@@ -4,7 +4,10 @@ import { userModel } from '../models/User';
 
 export const home = async (request, response) => {
   try {
-    const videos = await videoModel.find({}).sort({ createAt: 'desc' });
+    const videos = await videoModel
+      .find({})
+      .sort({ createAt: 'desc' })
+      .populate('owner');
     return response.render('home', { pageTitle: 'Home', videos });
   } catch (error) {
     console.error(error);
@@ -21,7 +24,7 @@ export const watch = async (request, response) => {
   return response.render('watch', {
     pageTitle: `${video.title}`,
     video,
-    owner,
+    owner: video.owner,
   });
 };
 export const getEdit = async (request, response) => {
