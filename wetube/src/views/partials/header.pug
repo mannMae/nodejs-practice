@@ -11,10 +11,12 @@ header
                     a(href="/videos/upload") Upload Video
                 li 
                     a(href="/users/edit") Edit Profile
+                        if loggedInUser.avatarUrl === "" 
+                            span 😀
+                        else
+                            img.header__avatar(src="/" + loggedInUser.avatarUrl)
                 li
                     a(href="/users/logout") Logout
-                //- li
-                //-     a(href="/my-profile") #{loggedInUser.name}님의 프로필
                 li
                     a(href=`/users/${loggedInUser._id}`) #{loggedInUser.name}님의 프로필
             else

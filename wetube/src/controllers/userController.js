@@ -79,6 +79,7 @@ export const see = async (request, response) => {
   if (!user) {
     return response.status(404).render('404');
   }
+  console.log(user);
   return response.render('users/profile', {
     pageTitle: user.name,
     user,
@@ -145,7 +146,7 @@ export const finishGithubLogin = async (request, response) => {
 
     if (!user) {
       user = await userModel.create({
-        avatartUrl: userData.avatart_url,
+        avatarUrl: userData.avatar_url,
         name: userData.name,
         username: userData.login,
         email: emailObject.email,
@@ -178,7 +179,7 @@ export const postEdit = async (request, response) => {
   } = request;
   await userModel.findByIdAndUpdate(
     _id,
-    { name, email, username, location },
+    { name, email, username, location, avatarUrl },
     { new: true }
   );
   request.session.user = {
