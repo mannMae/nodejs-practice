@@ -100,9 +100,9 @@ export const search = async (request, response) => {
           $regex: new RegExp(keyword, 'i'),
         },
       })
+      .populate('owner')
       .sort({ createAt: 'desc' });
   }
-  console.log(videos);
   return response.render('search', { pageTitle: 'Search', videos });
 };
 export const deleteVideo = async (request, response) => {
