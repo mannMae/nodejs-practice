@@ -75,7 +75,9 @@ export const logout = (request, response) => {
 
 export const see = async (request, response) => {
   const { id } = request.params;
-  const user = await userModel.findById(id).populate('videos');
+  const user = await userModel
+    .findById(id)
+    .populate({ path: 'videos', populate: { path: 'owner', model: 'User' } });
   if (!user) {
     return response.status(404).render('404');
   }
