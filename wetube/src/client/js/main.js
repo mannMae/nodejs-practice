@@ -1,5 +1,3 @@
 import '../scss/style.scss';
 
-const hello = async () => {};
-
-hello();
+console.log('main scripts');
