@@ -109,19 +109,27 @@ const handleDeactivateFullScreen = () => {
 };
 
 let controlsTimeout = null;
+let controlsMovementTimeout = null;
+
+const hideControls = () => {
+  videoControls.classList.remove('showing');
+};
 
 const handleMouseMove = () => {
   if (controlsTimeout) {
     clearTimeout(controlsTimeout);
     controlsTimeout = null;
   }
+  if (controlsMovementTimeout) {
+    clearTimeout(controlsMovementTimeout);
+    controlsMovementTimeout = null;
+  }
   videoControls.classList.add('showing');
+  controlsMovementTimeout = setTimeout(hideControls, 3000);
 };
 
 const handleMouseLeave = () => {
-  controlsTimeout = setTimeout(() => {
-    videoControls.classList.remove('showing');
-  }, 3000);
+  controlsTimeout = setTimeout(hideControls, 3000);
 };
 
 playButton.addEventListener('click', handleClickPlay);
