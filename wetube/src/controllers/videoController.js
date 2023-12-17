@@ -122,3 +122,19 @@ export const deleteVideo = async (request, response) => {
   await videoModel.findByIdAndDelete(id);
   return response.redirect('/');
 };
+
+export const registerView = async (request, response) => {
+  const { id } = request.params;
+  const video = await videoModel.findById(id);
+  if (!video) {
+    return response.sendStatus(404);
+  }
+  console.log(video.meta.views);
+  if (!video.meta.views) {
+    video.meta.views = 1;
+  } else {
+    video.meta.views = video.meta.views + 1;
+  }
+  await video.save();
+  return response.sendStatus(200);
+};
