@@ -7,11 +7,24 @@ let stream;
 let recorder;
 let videoFile;
 
+const files = {
+  input: 'recording.webm',
+  output: 'output.mp4',
+  thumb: 'thumbnail.jpg',
+};
+
+const downloadFile = (fileUrl, fileName) => {
+  const anchor = document.createElement('a');
+  anchor.href = fileUrl;
+  anchor.download = fileName;
+  document.body.appendChild(anchor);
+  anchor.click();
+};
+
 const handleClickStart = () => {
   if (videoFile) {
     handleDownload();
-  }
-  if (recorder) {
+  } else if (recorder) {
     handleStop();
   } else {
     handleStart();
@@ -19,6 +32,7 @@ const handleClickStart = () => {
 };
 
 const handleStart = () => {
+  console.log('starting');
   startButton.innerText = 'Stop Recording';
   recorder = new MediaRecorder(
     stream
@@ -35,12 +49,16 @@ const handleStart = () => {
 };
 
 const handleDownload = async () => {
+  console.log('Downloading');
+  startButton.removeEventListener('click', handleClickStart);
+  startButton.innerText = 'Transcoding...';
+  startButton.disabled = true;
   const ffmpeg = createFFmpeg({ log: true });
   await ffmpeg.load();
 
   ffmpeg.FS('writeFile', 'recording.webm', await fetchFile(videoFile));
 
-  await ffmpeg.run('-i', 'recording.webm', '-r', '60', 'output.mp4');
+  await ffmpeg.run('-i', 'recording.webm', '-r', '60', files.input);
   await ffmpeg.run(
     '-i',
     'recording.webm',
@@ -48,11 +66,11 @@ const handleDownload = async () => {
     '00:00:01',
     '-frames:v',
     '1',
-    'thumbnail.jpg'
+    files.thumb
   );
 
-  const mp4File = ffmpeg.FS('readFile', 'output.mp4');
-  const thumbFile = ffmpeg.FS('readFile', 'thumbnail.jpg');
+  const mp4File = ffmpeg.FS('readFile', files.ouput);
+  const thumbFile = ffmpeg.FS('readFile', files.thumb);
 
   const mp4Blob = new Blob([mp4File.buffer], { type: 'video/mp4' });
   const thumbBlob = new Blob([thumbFile.buffer], { type: 'image/jpg' });
@@ -61,23 +79,14 @@ const handleDownload = async () => {
   const jpgUrl = URL.createObjectURL(thumbBlob);
 
   console.log(mp4Url);
-  const anchor = document.createElement('a');
   // anchor.href = videoFile;
   // anchor.download = 'MyRecording.webm';
-  anchor.href = mp4Url;
-  anchor.download = 'MyRecording.mp4';
-  document.body.appendChild(anchor);
-  anchor.click();
+  downloadFile(mp4Url, 'MyRecording.mp4');
+  downloadFile(jpgUrl, 'MyThumbnail.jpg');
 
-  const thumbAnchor = document.createElement('a');
-  thumbAnchor.href = jpgUrl;
-  thumbAnchor.download = 'MyThumbnail.jpg';
-  document.body.appendChild(thumbAnchor);
-  thumbAnchor.click();
-
-  ffmpeg.FS('unlink', 'recording.webm');
-  ffmpeg.FS('unlink', 'output.mp4');
-  ffmpeg.FS('unlink', 'thumbnail.jpg');
+  ffmpeg.FS('unlink', files.input);
+  ffmpeg.FS('unlink', files.output);
+  ffmpeg.FS('unlink', files.thumb);
 
   URL.revokeObjectURL(mp4Url);
   URL.revokeObjectURL(jpgUrl);
@@ -87,6 +96,7 @@ const handleDownload = async () => {
 };
 
 const handleStop = () => {
+  console.log('stop');
   startButton.innerText = 'Download Recording';
   recorder.stop();
   recorder = null;
